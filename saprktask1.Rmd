@@ -1,0 +1,34 @@
+library(ggplot2)
+library(dplyr)
+
+data <- read.csv("C:\\Users\\sneha\\Downloads\\Iris.csv")
+data
+# Remove the species column
+iris_data <- data %>% select(-Species)
+# Elbow method to find the optimal number of clusters
+wcss <- vector()
+
+for (i in 1:15) {
+  kmeans_model <- kmeans(iris_data, centers = i)
+  wcss[i] <- kmeans_model$tot.withinss
+}
+
+# Generate the elbow plot
+elbow_plot <- data.frame(K = 1:15, WCSS = wcss) %>%
+  ggplot(aes(x = K, y = WCSS)) +
+  geom_line() +
+  geom_point() +
+  labs(x = "Number of Clusters (K)", y = "Within-Cluster Sum of Squares (WCSS)") +
+  ggtitle("Elbow Method: Optimal Number of Clusters") +
+  theme_minimal()
+
+# Print the elbow plot
+print(elbow_plot)
+
+# Extract the optimal number of clusters based on the elbow plot
+optimal_clusters <- elbow_plot$data %>%
+  filter(WCSS == min(WCSS)) %>%
+  pull(K)
+
+# Print the optimal number of clusters
+cat("Optimal number of clusters:", optimal_clusters)
